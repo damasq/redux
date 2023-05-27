@@ -1,26 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { Button } from "./component/Button";
+import { Input } from "./component/Input";
+import { useEffect, useState } from "react";
+import { createTask, loadTodos } from "./slices/tasks";
+import { Task } from "./component/Task";
+import { selectTasks } from "./selectors/tasks";
+import { useAppDispatch, useAppSelector } from "./store";
 
-function App() {
+const App = () => {
+  const dispatch = useAppDispatch();
+  const tasks = useAppSelector(selectTasks);
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    dispatch(loadTodos());
+  }, []);
+
+  const onAddClick = () => {
+    if (title) {
+      dispatch(
+        createTask({ id: Date.now(), userId: 1, title, completed: false })
+      );
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Input name="title" labelText="Title" value={title} onChange={setTitle} />
+      <Input
+        name="description"
+        labelText="Description"
+        value={description}
+        onChange={setDescription}
+      />
+      <Button onClick={onAddClick}>Add task</Button>
+      {tasks.map((task) => (
+        <Task task={task} />
+      ))}
     </div>
   );
-}
+};
 
 export default App;
